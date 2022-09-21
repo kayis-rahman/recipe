@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RestController
@@ -18,9 +19,21 @@ public class RecipeController {
     @Autowired
     private RecipeService recipeService;
 
-    @GetMapping("/all")
-    private String getAllRecipe() {
-        return "Hello Wold";
+
+    @DeleteMapping("/{recipeId}")
+    private ResponseEntity<Void> deleteRecipe(@PathVariable Long recipeId) {
+        recipeService.delete(recipeId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{recipeId}")
+    private RecipeDTO getOneRecipe(@PathVariable Long recipeId) {
+        return recipeService.getOne(recipeId);
+    }
+
+    @GetMapping()
+    private List<RecipeDTO> getAllRecipe() {
+        return recipeService.getAll();
     }
 
     @PostMapping()

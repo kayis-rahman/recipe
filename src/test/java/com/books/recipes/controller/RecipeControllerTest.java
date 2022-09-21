@@ -14,6 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
+
 import static com.books.recipes.data.MockDataRecipe.getNewRecipe;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -30,6 +32,34 @@ class RecipeControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private RecipeService recipeService;
+
+    @Test
+    void deleteARecipe() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/recipe/{recipeId}", recipeDTO.getId()))
+                .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    void getOneRecipe() throws Exception {
+        when(recipeService.getOne(anyLong())).thenReturn(recipeDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/recipe/{recipeId}", recipeDTO.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(recipeDTO.getName()))
+                .andExpect(jsonPath("$.instructions").value(recipeDTO.getInstructions()));
+    }
+
+    @Test
+    void getAllRecipes() throws Exception {
+        when(recipeService.getAll()).thenReturn(List.of(recipeDTO));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/recipe"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].name").value(recipeDTO.getName()))
+                .andExpect(jsonPath("$.[0].instructions").value(recipeDTO.getInstructions()))
+                .andDo(print());
+    }
 
     @Test
     void recipeCreationSuccess() throws Exception {
@@ -49,7 +79,7 @@ class RecipeControllerTest {
     @Test
     void recipeCreationFailureForConflict() throws Exception {
 
-        when(recipeService.add(any())).thenThrow(ResourceAlreadyPresent.class);
+        when(recipeService.add(any())).thenThrow(new ResourceAlreadyPresent("Recipe"));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/recipe")
                         .contentType(MediaType.APPLICATION_JSON)

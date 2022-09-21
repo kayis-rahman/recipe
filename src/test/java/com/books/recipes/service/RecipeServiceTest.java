@@ -1,6 +1,8 @@
 package com.books.recipes.service;
 
 import com.books.recipes.entities.Recipe;
+import com.books.recipes.exception.ResourceAlreadyPresent;
+import com.books.recipes.exception.ResourceNotFound;
 import com.books.recipes.model.RecipeDTO;
 import com.books.recipes.repos.RecipeRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,10 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+import java.util.Optional;
+
 import static com.books.recipes.data.MockDataRecipe.getNewRecipe;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RecipeServiceTest {
@@ -20,15 +26,41 @@ class RecipeServiceTest {
     @Mock
     private RecipeRepo recipeRepo;
     private RecipeService recipeService;
+    private Recipe newRecipe;
 
     @BeforeEach
     void setUp() {
+        newRecipe = getNewRecipe();
         recipeService = new RecipeService(recipeRepo);
     }
 
     @Test
+    void testDeleteRecipe() {
+        recipeService.delete(newRecipe.getId());
+        verify(recipeRepo, atLeast(1)).deleteById(anyLong());
+    }
+
+    @Test
+    void testGetOneRecipe() {
+        when(recipeRepo.findById(anyLong())).thenReturn(Optional.of(newRecipe));
+
+        RecipeDTO recipe = recipeService.getOne(newRecipe.getId());
+
+        assertThat(recipe).isNotNull();
+        assertThat(recipe.getId()).isNotNull();
+        assertThat(recipe.getInstructions()).isEqualTo(newRecipe.getInstructions());
+    }
+
+    @Test
+    void testGetOneRecipeExpectException() {
+        when(recipeRepo.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> recipeService.getOne(newRecipe.getId()))
+                .isInstanceOf(ResourceNotFound.class);
+    }
+
+    @Test
     void testSaveRecipeInfo() {
-        Recipe newRecipe = getNewRecipe();
         when(recipeRepo.save(any())).thenReturn(newRecipe);
 
         RecipeDTO recipeDTO = new RecipeDTO().from(newRecipe);
@@ -37,6 +69,28 @@ class RecipeServiceTest {
         assertThat(recipe).isNotNull();
         assertThat(recipe.getId()).isNotNull();
         assertThat(recipe.getInstructions()).isEqualTo(recipeDTO.getInstructions());
+    }
+
+    @Test
+    void testAlreadyExistRecipe() {
+        when(recipeRepo.findById(any())).thenReturn(Optional.of(newRecipe));
+
+        RecipeDTO recipeDTO = new RecipeDTO().from(newRecipe);
+
+        assertThatThrownBy(() -> recipeService.add(recipeDTO)).isInstanceOf(ResourceAlreadyPresent.class);
+
+        verify(recipeRepo, never()).save(any());
+    }
+
+    @Test
+    void testGetAllRecipes() {
+        when(recipeRepo.findAll()).thenReturn(List.of(newRecipe));
+
+        List<RecipeDTO> recipes = recipeService.getAll();
+
+        assertThat(recipes).isNotNull();
+        assertThat(recipes.size()).isEqualTo(1);
+
     }
 
 }
