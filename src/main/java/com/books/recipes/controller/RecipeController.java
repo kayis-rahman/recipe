@@ -26,6 +26,11 @@ public class RecipeController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping()
+    private RecipeDTO updateRecipe(@RequestBody RecipeDTO recipeDTO) {
+        return recipeService.update(recipeDTO);
+    }
+
     @GetMapping("/{recipeId}")
     private RecipeDTO getOneRecipe(@PathVariable Long recipeId) {
         return recipeService.getOne(recipeId);

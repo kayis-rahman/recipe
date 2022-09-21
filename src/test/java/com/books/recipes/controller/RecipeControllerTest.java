@@ -1,5 +1,6 @@
 package com.books.recipes.controller;
 
+import com.books.recipes.entities.Recipe;
 import com.books.recipes.exception.ResourceAlreadyPresent;
 import com.books.recipes.exception.ResourceNotFound;
 import com.books.recipes.helper.MapperHelper;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.List;
 
 import static com.books.recipes.data.MockDataRecipe.getNewRecipe;
+import static com.books.recipes.data.MockDataRecipe.recipeForUpdate;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -35,10 +37,29 @@ class RecipeControllerTest {
     private RecipeService recipeService;
 
     @Test
+    void updateRecipe() throws Exception {
+        Recipe recipeForUpdate = recipeForUpdate(getNewRecipe());
+
+        RecipeDTO updatedRecipeDto = new RecipeDTO().from(recipeForUpdate);
+
+        when(recipeService.update(any())).thenReturn(updatedRecipeDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/recipe")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(MapperHelper.asJsonString(updatedRecipeDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.instructions").value(updatedRecipeDto.getInstructions()))
+                .andExpect(jsonPath("$.numberOfServings").value(updatedRecipeDto.getNumberOfServings()))
+                .andExpect(jsonPath("$.vegetarian").value(updatedRecipeDto.getVegetarian()))
+                .andExpect(jsonPath("$.name").value(updatedRecipeDto.getName()));
+    }
+
+    @Test
     void deleteARecipe() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/recipe/{recipeId}", recipeDTO.getId()))
                 .andExpect(status().isNoContent());
 
+        verify(recipeService, atLeast(1)).delete(anyLong());
     }
 
     @Test

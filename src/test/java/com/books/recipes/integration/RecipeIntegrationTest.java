@@ -9,11 +9,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.books.recipes.data.MockDataRecipe.getNewRecipe;
+import static com.books.recipes.data.MockDataRecipe.recipeForUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -67,17 +70,38 @@ public class RecipeIntegrationTest {
 
     @Test
     void testGetARecipeById() {
-        ResponseEntity<Recipe> response = createRecipeWithAssertion();
-        Recipe insertedRecipe = response.getBody();
+        Recipe storedRecipe = createRecipeWithAssertion().getBody();
+        assertThat(storedRecipe).isNotNull();
 
-        ResponseEntity<RecipeDTO> getEntity = restTemplate.getForEntity("/recipe/{recipeId}", RecipeDTO.class, insertedRecipe.getId());
+        ResponseEntity<RecipeDTO> getEntity = restTemplate.getForEntity("/recipe/{recipeId}", RecipeDTO.class, storedRecipe.getId());
         assertThat(getEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         RecipeDTO body = getEntity.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getId()).isEqualTo(insertedRecipe.getId());
-        assertThat(body.getName()).isEqualTo(insertedRecipe.getName());
-        assertThat(body.getIngredients().size()).isEqualTo(insertedRecipe.getIngredients().size());
+        assertThat(body.getId()).isEqualTo(storedRecipe.getId());
+        assertThat(body.getName()).isEqualTo(storedRecipe.getName());
+        assertThat(body.getIngredients().size()).isEqualTo(storedRecipe.getIngredients().size());
+    }
+
+    @Test
+    void testUpdateRecipe() {
+        Recipe storedRecipe = createRecipeWithAssertion().getBody();
+        assertThat(storedRecipe).isNotNull();
+
+        recipeForUpdate(storedRecipe);
+
+        HttpEntity<RecipeDTO> httpEntity = new HttpEntity<>(new RecipeDTO().from(storedRecipe));
+        ResponseEntity<RecipeDTO> response = restTemplate.exchange("/recipe", HttpMethod.PUT, httpEntity, RecipeDTO.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        RecipeDTO body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getName()).isEqualTo(storedRecipe.getName());
+        assertThat(body.getInstructions()).isEqualTo(storedRecipe.getInstructions());
+        assertThat(body.getVegetarian()).isEqualTo(storedRecipe.getVegetarian());
+        assertThat(body.getNumberOfServings()).isEqualTo(storedRecipe.getNumberOfServings());
+        assertThat(body.getIngredients().size()).isEqualTo(storedRecipe.getIngredients().size());
     }
 
     private ResponseEntity<Recipe> createRecipeWithAssertion() {

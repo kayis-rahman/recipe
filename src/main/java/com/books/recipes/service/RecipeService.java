@@ -43,4 +43,19 @@ public class RecipeService {
     public void delete(Long recipeId) {
         recipeRepo.deleteById(recipeId);
     }
+
+    public RecipeDTO update(RecipeDTO recipeDTO) {
+        Optional<Recipe> maybeRecipe = recipeRepo.findById(recipeDTO.getId());
+        if (maybeRecipe.isPresent()) {
+            Recipe recipe = maybeRecipe.get();
+            recipe.setName(recipeDTO.getName());
+            recipe.setInstructions(recipeDTO.getInstructions());
+            recipe.setVegetarian(recipeDTO.getVegetarian());
+            recipe.setNumberOfServings(recipeDTO.getNumberOfServings());
+            recipeRepo.save(recipe);
+            return recipeDTO;
+        } else {
+            throw new ResourceNotFound("Recipe");
+        }
+    }
 }

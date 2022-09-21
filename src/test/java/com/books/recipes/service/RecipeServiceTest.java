@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.books.recipes.data.MockDataRecipe.getNewRecipe;
+import static com.books.recipes.data.MockDataRecipe.recipeForUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +33,35 @@ class RecipeServiceTest {
     void setUp() {
         newRecipe = getNewRecipe();
         recipeService = new RecipeService(recipeRepo);
+    }
+
+    @Test
+    void testUpdateRecipe() {
+        Recipe forUpdate = recipeForUpdate(getNewRecipe());
+        RecipeDTO recipeDTOForUpdate = new RecipeDTO().from(forUpdate);
+        when(recipeRepo.save(any())).thenReturn(forUpdate);
+        when(recipeRepo.findById(anyLong())).thenReturn(Optional.of(forUpdate));
+
+        RecipeDTO updated = recipeService.update(recipeDTOForUpdate);
+
+        assertThat(updated).isNotNull();
+        assertThat(updated.getNumberOfServings()).isEqualTo(recipeDTOForUpdate.getNumberOfServings());
+        assertThat(updated.getName()).isEqualTo(recipeDTOForUpdate.getName());
+        assertThat(updated.getInstructions()).isEqualTo(recipeDTOForUpdate.getInstructions());
+        assertThat(updated.getNumberOfServings()).isEqualTo(recipeDTOForUpdate.getNumberOfServings());
+        assertThat(updated.getIngredients().size()).isEqualTo(recipeDTOForUpdate.getIngredients().size());
+    }
+
+    @Test
+    void testUpdateRecipeExpectException() {
+        Recipe forUpdate = recipeForUpdate(getNewRecipe());
+        RecipeDTO recipeDTOForUpdate = new RecipeDTO().from(forUpdate);
+        when(recipeRepo.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> recipeService.update(recipeDTOForUpdate))
+                .isInstanceOf(ResourceNotFound.class);
+        
+        verify(recipeRepo, never()).save(any());
     }
 
     @Test
