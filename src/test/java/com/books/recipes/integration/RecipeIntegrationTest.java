@@ -65,6 +65,21 @@ public class RecipeIntegrationTest {
     }
 
 
+    @Test
+    void testGetARecipeById() {
+        ResponseEntity<Recipe> response = createRecipeWithAssertion();
+        Recipe insertedRecipe = response.getBody();
+
+        ResponseEntity<RecipeDTO> getEntity = restTemplate.getForEntity("/recipe/{recipeId}", RecipeDTO.class, insertedRecipe.getId());
+        assertThat(getEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        RecipeDTO body = getEntity.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getId()).isEqualTo(insertedRecipe.getId());
+        assertThat(body.getName()).isEqualTo(insertedRecipe.getName());
+        assertThat(body.getIngredients().size()).isEqualTo(insertedRecipe.getIngredients().size());
+    }
+
     private ResponseEntity<Recipe> createRecipeWithAssertion() {
         ResponseEntity<Recipe> insertRecipe = restTemplate.postForEntity("/recipe", recipe, Recipe.class);
         assertThat(insertRecipe.getStatusCode()).isEqualTo(HttpStatus.CREATED);

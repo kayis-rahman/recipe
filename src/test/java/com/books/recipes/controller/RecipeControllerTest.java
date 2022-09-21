@@ -1,6 +1,7 @@
 package com.books.recipes.controller;
 
 import com.books.recipes.exception.ResourceAlreadyPresent;
+import com.books.recipes.exception.ResourceNotFound;
 import com.books.recipes.helper.MapperHelper;
 import com.books.recipes.model.RecipeDTO;
 import com.books.recipes.service.RecipeService;
@@ -48,6 +49,17 @@ class RecipeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(recipeDTO.getName()))
                 .andExpect(jsonPath("$.instructions").value(recipeDTO.getInstructions()));
+    }
+
+    @Test
+    void getOneRecipeReturnException() throws Exception {
+        when(recipeService.getOne(anyLong())).thenThrow(ResourceNotFound.class);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/recipe/{recipeId}", recipeDTO.getId()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Record Not Found"))
+                .andDo(print());
+
     }
 
     @Test

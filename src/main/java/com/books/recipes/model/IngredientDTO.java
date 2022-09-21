@@ -1,7 +1,6 @@
 package com.books.recipes.model;
 
 import com.books.recipes.entities.Ingredient;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -10,7 +9,6 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @RequiredArgsConstructor
-@AllArgsConstructor
 public class IngredientDTO {
     private Long id;
 
