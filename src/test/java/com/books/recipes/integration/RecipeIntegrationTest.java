@@ -27,7 +27,7 @@ public class RecipeIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        restTemplate.delete("/recipe", recipe.getId());
+        restTemplate.delete("/recipe/{recipeId}", recipe.getId());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class RecipeIntegrationTest {
     void testDeleteRecipe() {
         createRecipeWithAssertion();
 
-        restTemplate.delete("/recipe", recipe.getId());
+        restTemplate.delete("/recipe/{recipeId}", recipe.getId());
 
         ResponseEntity<RecipeDTO> getEntity = restTemplate.getForEntity("/recipe/{recipeId}", RecipeDTO.class, recipe.getId());
         assertThat(getEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
