@@ -85,12 +85,32 @@ class RecipeControllerTest {
 
     @Test
     void getAllRecipes() throws Exception {
-        when(recipeService.getAll()).thenReturn(List.of(recipeDTO));
+        when(recipeService.getAll(any(), any(), any(), any(), any())).thenReturn(List.of(recipeDTO));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/recipe"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].name").value(recipeDTO.getName()))
                 .andExpect(jsonPath("$.[0].instructions").value(recipeDTO.getInstructions()))
+                .andDo(print());
+    }
+
+    @Test
+    void getAllRecipesWithFilter() throws Exception {
+        when(recipeService.getAll(any(), any(), any(), any(), any())).thenReturn(List.of(recipeDTO));
+        String instruction = "oven";
+        boolean vegetarian = true;
+        int numOfServings = 2;
+        String incRecipe = "Olive oil";
+        String excRecipe = "Salmon";
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                                "/recipe?instruction={instruction}&vegetarian={vegetarian}&numOfServings={numOfServings}&incRecipe={incRecipe}&excRecipe={excRecipe}",
+                                instruction, vegetarian, numOfServings, incRecipe, excRecipe
+                        )
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].vegetarian").value(vegetarian))
+                .andExpect(jsonPath("$.[0].numberOfServings").value(numOfServings))
+                .andExpect(jsonPath("$.[0].ingredients[0].name").value(incRecipe))
                 .andDo(print());
     }
 

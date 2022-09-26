@@ -9,9 +9,9 @@ public class MockDataRecipe {
     public static Recipe getNewRecipe() {
         Recipe newRecipe = new Recipe();
         newRecipe.setId(1L);
-        newRecipe.setName("Test Recipe");
-        newRecipe.setVegetarian(false);
-        newRecipe.setInstructions("Instructions");
+        newRecipe.setName("Roasted Asparagus");
+        newRecipe.setVegetarian(true);
+        newRecipe.setInstructions("Preheat oven to 425°F.");
         newRecipe.setNumberOfServings(2);
         newRecipe.setIngredients(getIngredients());
         return newRecipe;

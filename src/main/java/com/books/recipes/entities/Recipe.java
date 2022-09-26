@@ -1,4 +1,3 @@
-
 package com.books.recipes.entities;
 
 import lombok.Getter;
@@ -24,10 +23,11 @@ public class Recipe {
     private String name;
     private Boolean vegetarian;
     private Integer numberOfServings;
+    @Column(columnDefinition = "TEXT")
     private String instructions;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "ingredient", referencedColumnName = "id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     private List<Ingredient> ingredients;
 
     @Override

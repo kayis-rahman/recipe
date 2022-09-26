@@ -15,9 +15,9 @@ public class MockDataIngredients {
     public static Ingredient getIngredient() {
         Ingredient ingredient = new Ingredient();
         ingredient.setId(1L);
-        ingredient.setName("Salt");
-        ingredient.setType("Taste");
-        ingredient.setQuantity(2);
+        ingredient.setName("Olive oil");
+        ingredient.setType("Condiments");
+        ingredient.setQuantity("1 1/2 tbsp");
         return ingredient;
     }
 }

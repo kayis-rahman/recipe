@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -37,8 +38,14 @@ public class RecipeController {
     }
 
     @GetMapping()
-    private List<RecipeDTO> getAllRecipe() {
-        return recipeService.getAll();
+    private List<RecipeDTO> getAllRecipe(
+            @RequestParam Optional<String> instruction,
+            @RequestParam Optional<Boolean> vegetarian,
+            @RequestParam Optional<Integer> numOfServings,
+            @RequestParam Optional<String> incRecipe,
+            @RequestParam Optional<String> excRecipe
+    ) {
+        return recipeService.getAll(instruction, vegetarian, numOfServings, incRecipe, excRecipe);
     }
 
     @PostMapping()

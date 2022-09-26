@@ -19,10 +19,11 @@ public class Ingredient {
     private Long id;
 
     private String name;
-    private Integer quantity;
+    private String quantity;
     private String type;
 
     @ManyToOne
+    @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
 }

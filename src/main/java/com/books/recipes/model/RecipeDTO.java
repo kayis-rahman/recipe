@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +39,10 @@ public class RecipeDTO {
     }
 
     public RecipeDTO from(Recipe recipe) {
-        List<IngredientDTO> ingredientDTOList = recipe.getIngredients().stream()
-                .map(RecipeDTO::from)
-                .collect(Collectors.toList());
+        List<IngredientDTO> ingredientDTOList = new ArrayList<>();
+        if (recipe.getIngredients() != null) {
+            ingredientDTOList = recipe.getIngredients().stream().map(RecipeDTO::from).collect(Collectors.toList());
+        }
 
         this.setId(recipe.getId());
         this.setName(recipe.getName());
@@ -52,9 +54,7 @@ public class RecipeDTO {
     }
 
     public Recipe toRecipe() {
-        List<Ingredient> ingredientList = getIngredients().stream()
-                .map(IngredientDTO::toIngredient)
-                .collect(Collectors.toList());
+        List<Ingredient> ingredientList = getIngredients().stream().map(IngredientDTO::toIngredient).collect(Collectors.toList());
         Recipe recipe = new Recipe();
         recipe.setIngredients(ingredientList);
         recipe.setName(getName());

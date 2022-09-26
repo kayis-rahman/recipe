@@ -1,0 +1,91 @@
+[
+  {
+    "name": "Roasted Asparagus",
+    "vegetarian": true,
+    "numberOfServings": 2,
+    "instructions": "Preheat oven to 425°F.,\nCut off the woody bottom part of the asparagus spears and discard.,\nWith a vegetable peeler, peel off the skin on the bottom 2-3 inches of the spears (this keeps the asparagus from being all.\\,string.\\, and if you eat asparagus you know what I mean by that).,\nPlace asparagus on foil-lined baking sheet and drizzle with olive oil.,\nSprinkle with salt.,\nWith your hands, roll the asparagus around until they are evenly coated with oil and salt.,\nRoast for 10-15 minutes, depending on the thickness of your stalks and how tender you like them.,\nThey should be tender when pierced with the tip of a knife.,\nThe tips of the spears will get very brown but watch them to prevent burning.,\nThey are great plain, but sometimes I serve them with a light vinaigrette if we need something acidic to balance out our meal.\n",
+    "ingredients": [
+      {
+        "name": "Asparagus",
+        "quantity": "1 lb",
+        "type": "Produce"
+      },
+      {
+        "name": "Olive oil",
+        "quantity": "1 1/2 tbsp",
+        "type": "Condiments"
+      },
+      {
+        "name": "Kosher salt",
+        "quantity": "1/2 tsp",
+        "type": "Baking"
+      }
+    ]
+  },
+  {
+    "name": "Mic's Yorkshire Puds",
+    "vegetarian": false,
+    "numberOfServings": 1,
+    "instructions": "Put the flour and some seasoning into a large bowl.,\nStir in eggs, one at a time.,\nWhisk in milk until you have a smooth batter.,\nChill in the fridge for at least 30 minutes.,\nHeat oven to 220C/gas mark 7.,\nPour the oil into the holes of a 8-hole muffin tin.,\nHeat tin in the oven for 5 minutes.,\nLadle the batter mix into the tin.,\nBake for 30 minutes until well browned and risen.",
+    "ingredients": [
+      {
+        "name": "Plain flour",
+        "quantity": "200g",
+        "type": "Baking"
+      },
+      {
+        "name": "Eggs",
+        "quantity": "300ml",
+        "type": "Diary"
+      },
+      {
+        "name": "Vegetable oil",
+        "quantity": "3 tbsp",
+        "type": "Condiments"
+      }
+    ]
+  },
+  {
+    "name": "Smoked salmon & avocado terrines",
+    "vegetarian": false,
+    "numberOfServings": 3,
+    "instructions": "Lightly oil 8 small ramekins. Line with cling film, then the salmon (either 1 large or 2 smaller slices), allowing plenty of overhang.,\n    Gently mix together the cheese, chives and avocado with the lemon juice and plenty of seasoning. Spoon into the salmon-lined ramekins, press down, fold over the overlapping salmon, then cling film to seal in the mixture. Can be made the night before, but if making on the day they should be chilled for at least 4 hrs.,\n    On the day, gently lift the terrines out of the ramekins using the cling film, then remove the film. Place the terrines on plates with some baby salad leaves tossed in a little vinaigrette. Drizzle the terrine and plate with sweet chilli sauce. Serve on their own or with toast.",
+    "ingredients": [
+      {
+        "name": "Sunflower oil",
+        "quantity": "3 tbsp",
+        "type": "Greasing"
+      },
+      {
+        "name": "Salmon Sliced",
+        "quantity": "300g",
+        "type": "Fish"
+      },
+      {
+        "name": "Mild goat's cheese",
+        "quantity": "4 small pieces",
+        "type": "Greasing"
+      },
+      {
+        "name": "Snipped chives",
+        "quantity": "3 tbsp",
+        "type": "Herbs"
+      },
+      {
+        "name": "Ripe avocados",
+        "quantity": "3 large",
+        "type": "Fruit"
+      },
+      {
+        "name": "Lemon juice",
+        "quantity": "3 tbsp",
+        "type": "Herbs"
+      },
+      {
+        "name": "Sweet chilli sauce",
+        "quantity": "1 tbsp",
+        "type": "Drizzling"
+      }
+    ]
+  }
+]

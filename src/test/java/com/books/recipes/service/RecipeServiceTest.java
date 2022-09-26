@@ -4,6 +4,7 @@ import com.books.recipes.entities.Recipe;
 import com.books.recipes.exception.ResourceAlreadyPresent;
 import com.books.recipes.exception.ResourceNotFound;
 import com.books.recipes.model.RecipeDTO;
+import com.books.recipes.repos.RecipeCustomRepo;
 import com.books.recipes.repos.RecipeRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.books.recipes.data.MockDataRecipe.getNewRecipe;
@@ -26,13 +26,15 @@ class RecipeServiceTest {
 
     @Mock
     private RecipeRepo recipeRepo;
+    @Mock
+    private RecipeCustomRepo recipeCustomRepo;
     private RecipeService recipeService;
     private Recipe newRecipe;
 
     @BeforeEach
     void setUp() {
         newRecipe = getNewRecipe();
-        recipeService = new RecipeService(recipeRepo);
+        recipeService = new RecipeService(recipeCustomRepo, recipeRepo);
     }
 
     @Test
@@ -58,9 +60,8 @@ class RecipeServiceTest {
         RecipeDTO recipeDTOForUpdate = new RecipeDTO().from(forUpdate);
         when(recipeRepo.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> recipeService.update(recipeDTOForUpdate))
-                .isInstanceOf(ResourceNotFound.class);
-        
+        assertThatThrownBy(() -> recipeService.update(recipeDTOForUpdate)).isInstanceOf(ResourceNotFound.class);
+
         verify(recipeRepo, never()).save(any());
     }
 
@@ -85,8 +86,7 @@ class RecipeServiceTest {
     void testGetOneRecipeExpectException() {
         when(recipeRepo.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> recipeService.getOne(newRecipe.getId()))
-                .isInstanceOf(ResourceNotFound.class);
+        assertThatThrownBy(() -> recipeService.getOne(newRecipe.getId())).isInstanceOf(ResourceNotFound.class);
     }
 
     @Test
@@ -114,13 +114,7 @@ class RecipeServiceTest {
 
     @Test
     void testGetAllRecipes() {
-        when(recipeRepo.findAll()).thenReturn(List.of(newRecipe));
-
-        List<RecipeDTO> recipes = recipeService.getAll();
-
-        assertThat(recipes).isNotNull();
-        assertThat(recipes.size()).isEqualTo(1);
-
+        recipeService.getAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+        verify(recipeRepo, atMostOnce()).findAll();
     }
-
 }

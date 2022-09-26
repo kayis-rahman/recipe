@@ -4,6 +4,7 @@ import com.books.recipes.entities.Recipe;
 import com.books.recipes.exception.ResourceAlreadyPresent;
 import com.books.recipes.exception.ResourceNotFound;
 import com.books.recipes.model.RecipeDTO;
+import com.books.recipes.repos.RecipeCustomRepo;
 import com.books.recipes.repos.RecipeRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,19 +17,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecipeService {
 
+    private final RecipeCustomRepo recipeCustomRepo;
     private final RecipeRepo recipeRepo;
 
     public Recipe add(RecipeDTO recipeDTO) {
-        Optional<Recipe> recipe = recipeRepo.findById(recipeDTO.getId());
-        if (recipe.isEmpty()) {
-            return recipeRepo.save(recipeDTO.toRecipe());
-        } else {
-            throw new ResourceAlreadyPresent("Recipe");
+        if (recipeDTO.getId() != null) {
+            Optional<Recipe> recipe = recipeRepo.findById(recipeDTO.getId());
+            if (recipe.isPresent()) {
+                throw new ResourceAlreadyPresent("Recipe");
+            }
         }
+        return recipeRepo.save(recipeDTO.toRecipe());
     }
 
-    public List<RecipeDTO> getAll() {
-        return recipeRepo.findAll().stream().map(recipe -> new RecipeDTO().from(recipe)).collect(Collectors.toList());
+    public List<RecipeDTO> getAll(Optional<String> instruction, Optional<Boolean> vegetarian, Optional<Integer> numOfServings, Optional<String> incRecipe, Optional<String> excRecipe) {
+        return recipeCustomRepo.findAllWithFilter(instruction, vegetarian, numOfServings, incRecipe, excRecipe).stream().map(recipe -> new RecipeDTO().from(recipe)).collect(Collectors.toList());
     }
 
     public RecipeDTO getOne(Long recipeId) {

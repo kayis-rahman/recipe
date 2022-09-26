@@ -3,17 +3,25 @@ package com.books.recipes.integration;
 
 import com.books.recipes.entities.Recipe;
 import com.books.recipes.model.RecipeDTO;
+import com.books.recipes.repos.RecipeRepo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
 
 import static com.books.recipes.data.MockDataRecipe.getNewRecipe;
 import static com.books.recipes.data.MockDataRecipe.recipeForUpdate;
@@ -28,9 +36,12 @@ public class RecipeIntegrationTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private RecipeRepo recipeRepo;
+
     @BeforeEach
     void setUp() {
-        restTemplate.delete("/recipe/{recipeId}", recipe.getId());
+        recipeRepo.deleteAll();
     }
 
     @Test
@@ -55,6 +66,32 @@ public class RecipeIntegrationTest {
         RecipeDTO[] body = response.getBody();
         assertThat(body).isNotNull();
         assertThat(body.length).isGreaterThan(0);
+    }
+
+    @Test
+    void testGetAllRecipeWithFilter() throws IOException {
+        loadRecipeListAndInsert();
+
+        String instruction = "oven";
+        boolean vegetarian = true;
+        int numOfServings = 2;
+        String incRecipe = "Olive oil";
+        String excRecipe = "Salmon";
+        ResponseEntity<RecipeDTO[]> response = restTemplate.getForEntity(
+                "/recipe?instruction={instruction}&vegetarian={vegetarian}&numOfServings={numOfServings}&incRecipe={incRecipe}&excRecipe={excRecipe}",
+                RecipeDTO[].class,
+                instruction, vegetarian, numOfServings, incRecipe, excRecipe
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        RecipeDTO[] body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.length).isEqualTo(1);
+        assertThat(body[0].getNumberOfServings()).isEqualTo(numOfServings);
+        assertThat(body[0].getVegetarian()).isEqualTo(vegetarian);
+        assertThat(body[0].getInstructions()).contains(instruction);
+        assertThat(body[0].getIngredients()).anyMatch(ingredient -> ingredient.getName().contains(incRecipe));
+        assertThat(body[0].getIngredients()).noneMatch(ingredient -> ingredient.getName().contains(excRecipe));
     }
 
     @Test
@@ -108,5 +145,15 @@ public class RecipeIntegrationTest {
         ResponseEntity<Recipe> insertRecipe = restTemplate.postForEntity("/recipe", recipe, Recipe.class);
         assertThat(insertRecipe.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return insertRecipe;
+    }
+
+    private void loadRecipeListAndInsert() throws IOException {
+        File file = new ClassPathResource("recipe.json").getFile();
+        String jsonString = new String(Files.readAllBytes(file.toPath()));
+        RecipeDTO[] recipeDTOS = new ObjectMapper().readValue(jsonString, RecipeDTO[].class);
+        Arrays.stream(recipeDTOS).forEach(recipeDTO -> {
+            ResponseEntity<Recipe> insertRecipe = restTemplate.postForEntity("/recipe", recipeDTO, Recipe.class);
+            assertThat(insertRecipe.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        });
     }
 }

@@ -16,8 +16,9 @@ public class IngredientDTO {
     @NotNull(message = "Ingredients name should not null")
     private String name;
 
-    @NotNull(message = "Quantity name should not null")
-    private Integer quantity;
+    @NotNull(message = "Quantity should not null")
+    @NotEmpty(message = "Quantity should not empty")
+    private String quantity;
 
     @NotEmpty(message = "Type should not empty")
     @NotNull(message = "Type name should not null")

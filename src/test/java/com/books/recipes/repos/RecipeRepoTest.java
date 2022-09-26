@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -21,8 +20,6 @@ class RecipeRepoTest {
     private final Recipe recipe = getNewRecipe();
     @Autowired
     private RecipeRepo recipeRepo;
-    @Autowired
-    private TestEntityManager testEntityManager;
 
     @Test
     void testStoreRecipeSuccessfully() {
@@ -37,18 +34,18 @@ class RecipeRepoTest {
 
     @Test
     void testGetARecipe() {
+        Recipe storedRecipe = recipeRepo.save(recipe);
 
-        recipeRepo.save(recipe);
-        Optional<Recipe> maybeRecipe = recipeRepo.findById(recipe.getId());
+        Optional<Recipe> maybeRecipe = recipeRepo.findById(storedRecipe.getId());
 
         assertThat(maybeRecipe.isEmpty()).isFalse();
-        assertThat(maybeRecipe.get().getId()).isEqualTo(recipe.getId());
-        assertThat(maybeRecipe.get().getName()).isEqualTo(recipe.getName());
+        assertThat(maybeRecipe.get().getId()).isEqualTo(storedRecipe.getId());
+        assertThat(maybeRecipe.get().getName()).isEqualTo(storedRecipe.getName());
     }
 
     @Test
     void testGetAllRecipe() {
-        recipeRepo.save(recipe);
+        Recipe storedRecipe = recipeRepo.save(recipe);
 
         List<Recipe> recipes = recipeRepo.findAll();
 
@@ -56,9 +53,8 @@ class RecipeRepoTest {
         assertThat(recipes.size()).isEqualTo(1);
         Recipe foundRecipe = recipes.get(0);
         assertThat(foundRecipe).isNotNull();
-        assertThat(foundRecipe.getName()).isEqualTo(recipe.getName());
-        assertThat(foundRecipe.getInstructions()).isEqualTo(recipe.getInstructions());
-        assertThat(foundRecipe.getIngredients().size()).isEqualTo(recipe.getIngredients().size());
+        assertThat(foundRecipe.getName()).isEqualTo(storedRecipe.getName());
+        assertThat(foundRecipe.getInstructions()).isEqualTo(storedRecipe.getInstructions());
+        assertThat(foundRecipe.getIngredients().size()).isEqualTo(storedRecipe.getIngredients().size());
     }
-
 }
